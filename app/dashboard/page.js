@@ -1,16 +1,24 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 function Dashboard() {
   const { setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false); // Menandai apakah komponen sudah dimuat di klien
 
   useEffect(() => {
-    setTheme("light");
+    setMounted(true); // Mengatur state mounted saat komponen dimuat di klien
   }, []);
 
-  return <div>page</div>;
+  // Jangan setTheme selama SSR (Server-Side Rendering), hanya setelah mounted
+  useEffect(() => {
+    if (mounted) {
+      setTheme("light");
+    }
+  }, [mounted, setTheme]);
+
+  return <div>Dashboard Page</div>;
 }
 
 export default Dashboard;
