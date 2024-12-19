@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,9 +11,33 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useForm } from "react-hook-form";
+import GlobalApi from "@/app/_services/GlobalApi";
+import { index } from "drizzle-orm/mysql-core";
 
 function AddNewStudents() {
   const [open, setOpen] = useState(false);
+  const [grades, setGrades] = useState([]);
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm();
+
+  useEffect(() => {
+    GetAllGradesList();
+  }, []);
+
+  const GetAllGradesList = () => {
+    GlobalApi.GetAllGrades().then((resp) => {
+       setGrades(resp.data);
+    });
+  };
+
+  const onSubmit = (data) => {
+    console.log(data);
+  };
   return (
     <div>
       <Button
@@ -28,44 +52,62 @@ function AddNewStudents() {
           <DialogHeader>
             <DialogTitle>Add New Student</DialogTitle>
             <DialogDescription>
-              <div className="grid gap-4 py-4 text-black font-bold">
-                <label>Full Name</label>
-                <Input placeholder="Enter Full Name" />
-              </div>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <div className="grid gap-4 py-4 text-black font-bold">
+                  <label>Full Name</label>
 
-              <div className="flex gap-2 flex-col">
-                <label>Select Grade</label>
-                <select className="p-2 border rounded-lg font-bold">
-                  <option value={"5th"}>5th</option>
-                  <option value={"6th"}>6th</option>
-                  <option value={"7th"}>7th</option>
-                  <option value={"8th"}>8th</option>
-                </select>
-              </div>
-              <div className="grid gap-4 py-4 text-black font-bold">
-                <label>Contact Number</label>
-                <Input placeholder="Enter Contact Number" />
-              </div>
-              <div className="grid gap-4 py-4 text-black font-bold">
-                <label>Address</label>
-                <Input placeholder="Enter Address" />
-              </div>
+                  <Input
+                    placeholder="Enter Full Name"
+                    {...register("name", { required: true })}
+                  />
+                </div>
 
-              <div className="flex justify-end gap-3 items-center mt-4">
-                <Button
-                  className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
-                  onClick={() => setOpen(false)}
-                  variant="ghost"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
-                  onClick={() => console.log("Save")}
-                >
-                  Save
-                </Button>
-              </div>
+                <div className="flex gap-2 flex-col">
+                  <label>Select Grade</label>
+                  <select
+                    className="p-2 border rounded-lg font-bold"
+                    {...register("grade", { required: true })}
+                  >
+                    {grades.map((item, index) => (
+                      <option key={index} value={item.grade}>
+                        {item.grade}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="grid gap-4 py-4 text-black font-bold">
+                  <label>Contact Number</label>
+
+                  <Input
+                    placeholder="Enter Contact Number"
+                    type="number"
+                    {...register("contact")}
+                  />
+                </div>
+                <div className="grid gap-4 py-4 text-black font-bold">
+                  <label>Address</label>
+                  <Input
+                    placeholder="Enter Address"
+                    {...register("address", { required: true })}
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 items-center mt-4">
+                  <Button
+                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
+                    onClick={() => setOpen(false)}
+                    variant="ghost"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
+                    type="submit"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </form>
             </DialogDescription>
           </DialogHeader>
         </DialogContent>
