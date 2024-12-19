@@ -6,9 +6,9 @@ export const GRADES = mysqlTable("grades", {
 });
 
 export const STUDENTS = mysqlTable("students", {
-  id: int("id").primaryKey(),
+  id: int("id").primaryKey().autoincrement(),
   name: varchar("name", { length: 45 }).notNull(),
   grade: varchar("grade", {length:50}).notNull(),
-  address: varchar("address", {length:45}),
-  contact: int("contact", {length:20})
+  address: varchar("address", {length:255}),
+  contact: varchar("contact", {length:20})
 });

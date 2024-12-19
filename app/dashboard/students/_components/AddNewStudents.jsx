@@ -8,20 +8,21 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import GlobalApi from "@/app/_services/GlobalApi";
-import { index } from "drizzle-orm/mysql-core";
+import { toast } from "sonner";
+import { LoaderIcon } from "lucide-react";
 
 function AddNewStudents() {
   const [open, setOpen] = useState(false);
   const [grades, setGrades] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm();
 
@@ -31,12 +32,22 @@ function AddNewStudents() {
 
   const GetAllGradesList = () => {
     GlobalApi.GetAllGrades().then((resp) => {
-       setGrades(resp.data);
+      setGrades(resp.data);
     });
   };
 
   const onSubmit = (data) => {
-    console.log(data);
+    setIsLoading(true);
+    GlobalApi.CreateNewStudent(data).then((resp) => {
+      //ini adalah untuk useStatenya
+      console.log("---", resp);
+      if (resp.data) {
+        reset();
+        setOpen(false);
+        toast("New Student Added!", { position: "top-center" });
+      }
+      setIsLoading(false);
+    });
   };
   return (
     <div>
@@ -94,6 +105,7 @@ function AddNewStudents() {
 
                 <div className="flex justify-end gap-3 items-center mt-4">
                   <Button
+                    type="button"
                     className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
                     onClick={() => setOpen(false)}
                     variant="ghost"
@@ -103,8 +115,13 @@ function AddNewStudents() {
                   <Button
                     className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
                     type="submit"
+                    disable={isLoading}
                   >
-                    Save
+                    {isLoading ? (
+                      <LoaderIcon className="animate-spin" />
+                    ) : (
+                      "Save"
+                    )}
                   </Button>
                 </div>
               </form>
