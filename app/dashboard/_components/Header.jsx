@@ -6,19 +6,19 @@ import React from "react";
 
 function Header() {
   const { user } = useKindeBrowserClient();
+
   return (
     <div className="p-4 shadow-md border flex justify-between">
       <div></div>
       <div>
         <Image
-          src={user?.picture}
+          src={user?.picture || "/default-profile.png"} // Fallback image
           alt="profile"
           width={35}
           height={35}
           className="rounded-full"
         />
       </div>
-      
     </div>
   );
 }

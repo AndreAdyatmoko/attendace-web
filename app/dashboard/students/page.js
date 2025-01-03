@@ -3,39 +3,46 @@
 import React, { useEffect, useState } from "react";
 import AddNewStudents from "./_components/AddNewStudents";
 import GlobalApi from "@/app/_services/GlobalApi";
-import StudentListTable from "./_components/StudentListTable";
+import StudentListTable from "./_components/StudentListTable"; // Pastikan import ini benar
 
 function Student() {
-  // Declare state at the top level of the component
   const [studentList, setStudentList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch all the data of students
   useEffect(() => {
     const fetchStudents = async () => {
       try {
-        const response = await GlobalApi.GetALLStudent(); // Function to call the API
-        if (response?.data) {
-          setStudentList(response.data); // Update state with fetched data
-          console.log("Fetched Student Data:", response.data);
+        const response = await GlobalApi.GetALLStudent();
+        if (response?.data?.result) {
+          setStudentList(response.data.result);
         } else {
-          console.warn("No data received from API");
+          console.warn("No student data found in response");
         }
       } catch (error) {
         console.error("Error fetching student data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchStudents();
   }, []);
 
+  const addStudent = (newStudent) => {
+    setStudentList((prevList) => [...prevList, newStudent]);
+  };
+
   return (
     <div className="p-7">
       <h2 className="font-bold text-2xl flex justify-between items-center">
         Students
-        <AddNewStudents />
+        <AddNewStudents onAddStudent={addStudent} />
       </h2>
-      {/* Pass the studentList state as props to StudentListTable */}
-      <StudentListTable studentList={studentList} />
+      {isLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <StudentListTable studentList={studentList} />
+      )}
     </div>
   );
 }

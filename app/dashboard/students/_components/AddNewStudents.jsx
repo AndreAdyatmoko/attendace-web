@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { toast } from "sonner";
 import { LoaderIcon } from "lucide-react";
 
-function AddNewStudents() {
+function AddNewStudents({ onAddStudent }) {
   const [open, setOpen] = useState(false);
   const [grades, setGrades] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,38 +27,37 @@ function AddNewStudents() {
   } = useForm();
 
   useEffect(() => {
-    GetAllGradesList();
-  }, []);
-
-  const GetAllGradesList = () => {
     GlobalApi.GetAllGrades().then((resp) => {
       setGrades(resp.data);
     });
-  };
+  }, []);
 
   const onSubmit = (data) => {
     setIsLoading(true);
     GlobalApi.CreateNewStudent(data).then((resp) => {
-      //ini adalah untuk useStatenya
-      console.log("---", resp);
       if (resp.data) {
+        const newStudent = {
+          id: resp.data.insertId, // ID dari response API
+          ...data, // Data input yang dikirim ke API
+        };
         reset();
         setOpen(false);
         toast("New Student Added!", { position: "top-center" });
+        onAddStudent(newStudent); // Kirim data siswa baru ke komponen induk
       }
       setIsLoading(false);
     });
   };
+
   return (
     <div>
       <Button
         className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
         onClick={() => setOpen(true)}
       >
-        {" "}
         Add New Student
       </Button>
-      <Dialog open={open}>
+      <Dialog open={open} onOpenChange={(open) => setOpen(open)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Add New Student</DialogTitle>
@@ -66,13 +65,11 @@ function AddNewStudents() {
               <form onSubmit={handleSubmit(onSubmit)}>
                 <div className="grid gap-4 py-4 text-black font-bold">
                   <label>Full Name</label>
-
                   <Input
                     placeholder="Enter Full Name"
                     {...register("name", { required: true })}
                   />
                 </div>
-
                 <div className="flex gap-2 flex-col">
                   <label>Select Grade</label>
                   <select
@@ -88,7 +85,6 @@ function AddNewStudents() {
                 </div>
                 <div className="grid gap-4 py-4 text-black font-bold">
                   <label>Contact Number</label>
-
                   <Input
                     placeholder="Enter Contact Number"
                     type="number"
@@ -102,26 +98,16 @@ function AddNewStudents() {
                     {...register("address", { required: true })}
                   />
                 </div>
-
                 <div className="flex justify-end gap-3 items-center mt-4">
                   <Button
                     type="button"
-                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
-                    onClick={() => setOpen(false)}
                     variant="ghost"
+                    onClick={() => setOpen(false)}
                   >
                     Cancel
                   </Button>
-                  <Button
-                    className="transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110"
-                    type="submit"
-                    disable={isLoading}
-                  >
-                    {isLoading ? (
-                      <LoaderIcon className="animate-spin" />
-                    ) : (
-                      "Save"
-                    )}
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading ? <LoaderIcon className="animate-spin" /> : "Save"}
                   </Button>
                 </div>
               </form>

@@ -34,24 +34,31 @@ function SideNav() {
       link: "/dashboard/settings",
     },
   ];
+
+  // Fallback image URL
+  const fallbackImage = "/path/to/default-avatar.png";
+
   return (
     <div className="border shadow-md h-screen p-5">
       <Image src="/logo.svg" alt="logo" width={180} height={50} />
 
-      <hr className="my-5"></hr>
+      <hr className="my-5" />
 
-      {menuList.map((menu, index) => (
-        <Link href={menu.link}>
-          <h2 className=" flex items-center gap-3 cursor-pointer text-md p-4 text-slate-500 hover:bg-primary hover:text-white rounded-lg my-2 transition duration-200 ease-in-out ">
+      {/* Menu list */}
+      {menuList.map((menu) => (
+        <Link href={menu.link} key={menu.id}>
+          <h2 className="flex items-center gap-3 cursor-pointer text-md p-4 text-slate-500 hover:bg-primary hover:text-white rounded-lg my-2 transition duration-200 ease-in-out">
             <menu.icon />
             {menu.name}
           </h2>
         </Link>
       ))}
 
+      {/* Profile Section */}
       <div className="flex gap-2 items-center bottom-5 fixed p-4">
+        {/* Ensure src is never empty */}
         <Image
-          src={user?.picture}
+          src={user?.picture || fallbackImage} // Use fallback image if picture is unavailable
           alt="profile"
           width={35}
           height={35}
