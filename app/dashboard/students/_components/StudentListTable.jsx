@@ -240,8 +240,6 @@ const styles = {
     borderRadius: "5px",
     minWidth: "40px",
     textAlign: "center",
-    textAlign: "left",
-    textAlign: "left",
   },
 };
 
