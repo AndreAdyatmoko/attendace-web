@@ -241,6 +241,7 @@ const styles = {
     minWidth: "40px",
     textAlign: "center",
     textAlign: "left",
+    textAlign: "left",
   },
 };
 
