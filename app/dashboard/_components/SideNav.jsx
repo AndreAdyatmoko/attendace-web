@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { GraduationCap, Hand, LayoutList, Settings } from "lucide-react";
 import { useKindeBrowserClient } from "@kinde-oss/kinde-auth-nextjs";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 function SideNav() {
   const { user } = useKindeBrowserClient();
@@ -35,6 +36,11 @@ function SideNav() {
     },
   ];
 
+  const path = usePathname();
+  useEffect(() => {
+    console.log(path);
+  }, [path]);
+
   // Fallback image URL
   const fallbackImage = "/path/to/default-avatar.png";
 
@@ -47,7 +53,9 @@ function SideNav() {
       {/* Menu list */}
       {menuList.map((menu) => (
         <Link href={menu.link} key={menu.id}>
-          <h2 className="flex items-center gap-3 cursor-pointer text-md p-4 text-slate-500 hover:bg-primary hover:text-white rounded-lg my-2 transition duration-200 ease-in-out">
+          <h2
+            className={`flex items-center gap-3 cursor-pointer text-md p-4 text-slate-500 hover:bg-primary hover:text-white rounded-lg my-2 transition duration-200 ease-in-out ${path==menu.path&&'bg-primary text-white'}`}
+          >
             <menu.icon />
             {menu.name}
           </h2>

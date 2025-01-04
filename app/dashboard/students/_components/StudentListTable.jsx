@@ -1,20 +1,71 @@
-"use client";
-
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react"; // Corrected import
-import { Trash } from "lucide-react"; // Corrected import
+import { Search, Trash } from "lucide-react"; // Corrected imports
 import React, { useState } from "react";
+import axios from "axios"; // Import axios
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
-const StudentListTable = ({ studentList }) => {
+const StudentListTable = ({ studentList, onDelete }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const rowsPerPage = 5;
 
-  const CustomButtons = () => {
+  const CustomButtons = ({ id, onDelete }) => {
+    const deleteRecord = async () => {
+      console.log(`Deleting student with id: ${id}`);
+      try {
+        // Call the backend API to delete the student using axios
+        const response = await axios.delete(`/api/student/${id}`);
+        console.log("Response:", response);
+
+        if (response.status === 200) {
+          console.log("Student deleted successfully");
+          onDelete(id); // Remove the student from the parent state
+        } else {
+          console.error("Failed to delete the student");
+          alert("Failed to delete student.");
+        }
+      } catch (error) {
+        console.error("Error deleting record:", error);
+        alert("An error occurred while deleting the student.");
+      }
+    };
+
     return (
-      <Button variant="destructive">
-        <Trash />
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger>
+          <Button variant="destructive">
+            <Trash />
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              record and remove your data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={deleteRecord}
+            >
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     );
   };
 
@@ -29,10 +80,10 @@ const StudentListTable = ({ studentList }) => {
   // Pagination logic using the filtered list
   const indexOfLastRow = currentPage * rowsPerPage;
   const indexOfFirstRow = indexOfLastRow - rowsPerPage;
-  const currentRows = filteredList.slice(indexOfFirstRow, indexOfLastRow); // Apply pagination to filtered list
+  const currentRows = filteredList.slice(indexOfFirstRow, indexOfLastRow);
 
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-  const totalPages = Math.ceil(filteredList.length / rowsPerPage); // Use filtered list for total pages
+  const totalPages = Math.ceil(filteredList.length / rowsPerPage);
 
   return (
     <div style={styles.container}>
@@ -41,7 +92,7 @@ const StudentListTable = ({ studentList }) => {
         <p>No students found.</p>
       ) : (
         <div style={styles.tableWrapper}>
-          {/* Fixed Search Bar */}
+          {/* Search Bar */}
           <div
             style={styles.searchWrapper}
             className="relative mb-4 max-w-sm items-center"
@@ -62,6 +113,7 @@ const StudentListTable = ({ studentList }) => {
             />
           </div>
 
+          {/* Student Table */}
           <table style={styles.table}>
             <thead>
               <tr>
@@ -83,7 +135,7 @@ const StudentListTable = ({ studentList }) => {
                     <td style={styles.td}>{student.contact}</td>
                     <td style={styles.td}>{student.grade}</td>
                     <td style={styles.td}>
-                      <CustomButtons />
+                      <CustomButtons id={student.id} onDelete={onDelete} />
                     </td>
                   </tr>
                 ))
@@ -149,11 +201,11 @@ const styles = {
   },
   searchInputWithIcon: {
     padding: "8px",
-    paddingLeft: "35px", // Space for the search icon
+    paddingLeft: "35px",
     border: "1px solid #ddd",
     borderRadius: "4px",
     flexGrow: 1,
-    boxSizing: "border-box", // Make sure padding does not affect input size
+    boxSizing: "border-box",
   },
   table: {
     width: "100%",
@@ -188,6 +240,7 @@ const styles = {
     borderRadius: "5px",
     minWidth: "40px",
     textAlign: "center",
+    textAlign: "left",
   },
 };
 

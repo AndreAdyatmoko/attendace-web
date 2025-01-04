@@ -56,3 +56,37 @@ export async function GET() {
     );
   }
 }
+
+export async function DELETE(req) {
+  try {
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Missing 'id' parameter" },
+        { status: 400 }
+      );
+    }
+
+    const result = await db.delete(STUDENTS).where(eq(STUDENTS.id, id));
+
+    if (result.rowCount === 0) {
+      return NextResponse.json(
+        { error: "No record found with the given ID" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Record deleted successfully", id },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("Error deleting record:", error);
+    return NextResponse.json(
+      { error: "An error occurred while deleting the record" },
+      { status: 500 }
+    );
+  }
+}
