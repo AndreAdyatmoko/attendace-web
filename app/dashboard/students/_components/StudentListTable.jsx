@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Search, Trash } from "lucide-react"; // Corrected imports
 import React, { useState } from "react";
 import axios from "axios"; // Import axios
+import { toast } from "sonner";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,15 +25,16 @@ const StudentListTable = ({ studentList, onDelete }) => {
       console.log(`Deleting student with id: ${id}`);
       try {
         // Call the backend API to delete the student using axios
-        const response = await axios.delete(`/api/student/${id}`);
+        const response = await axios.delete(`/api/student?id=${id}`);
         console.log("Response:", response);
 
         if (response.status === 200) {
           console.log("Student deleted successfully");
           onDelete(id); // Remove the student from the parent state
-        } else {
-          console.error("Failed to delete the student");
-          alert("Failed to delete student.");
+          toast("Successfully deleted students!", {
+            position: "top-center",
+            autoClose: 1000,
+          });
         }
       } catch (error) {
         console.error("Error deleting record:", error);
