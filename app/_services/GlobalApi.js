@@ -11,9 +11,12 @@ const DeleteStudent = (id) =>
         params: {id}
     })
 
+const GetAttendanceList=(grade,month)=> axios.get(`/api/attendance?grade=`+grade+'&month='+month)
+
 export default {
     GetAllGrades,
     CreateNewStudent,
     GetALLStudent,
-    DeleteStudent
+    DeleteStudent,
+    GetAttendanceList
 }

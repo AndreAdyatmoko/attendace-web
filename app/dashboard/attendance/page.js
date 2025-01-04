@@ -2,22 +2,31 @@
 
 import GradeSelect from "@/app/_components/GradeSelect";
 import MonthSelection from "@/app/_components/MonthSelection";
+import GlobalApi from "@/app/_services/GlobalApi";
 import { Button } from "@/components/ui/button";
+import moment from "moment";
 import React, { useState } from "react";
 
 function Attendance() {
   const [selectedMonth, setSelectedMonth] = useState();
-  const [selectedGrade, setSelectedGrade] = useState(); // State to store selected grade
+  const [selectedGrade, setSelectedGrade] = useState();
 
   const onSearchHandler = () => {
-    console.log(selectedMonth, selectedGrade); // Log the selected values
+    if (!selectedMonth || !selectedGrade) {
+      console.error("Please select both month and grade.");
+      return;
+    }
+
+    const month = moment(selectedMonth).format("MM/YYYY");
+    GlobalApi.GetAttendanceList(selectedGrade, month).then((resp) => {
+      console.log(resp.data);
+    });
   };
 
   return (
     <div className="p-10">
       <h2 className="text-2xl font-bold">Attendance</h2>
       {/* Search Option */}
-
       <div className="flex gap-5 my-5 p-5 rounded-lg shadow-md">
         <div className="flex gap-2 items-center">
           <label>Select Month:</label>
@@ -25,8 +34,7 @@ function Attendance() {
         </div>
         <div className="flex gap-2 items-center">
           <label>Select Grade:</label>
-          {/* Correctly pass the function to GradeSelect */}
-          <GradeSelect selectedGrade={setSelectedGrade} />
+          <GradeSelect selectedGrade={(value) => setSelectedGrade(value)} />
         </div>
         <Button onClick={onSearchHandler}>Search</Button>
       </div>
