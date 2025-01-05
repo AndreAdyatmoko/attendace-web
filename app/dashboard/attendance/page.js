@@ -6,23 +6,25 @@ import GlobalApi from "@/app/_services/GlobalApi";
 import { Button } from "@/components/ui/button";
 import moment from "moment";
 import React, { useState } from "react";
+import AttendanceGrid from "./_components/AttendaceGrid";
 
 function Attendance() {
   const [selectedMonth, setSelectedMonth] = useState();
   const [selectedGrade, setSelectedGrade] = useState();
+  const [attendanceList, setAttendanceList] = useState([]);
+
+  // Hanlder to fetch attendace
 
   const onSearchHandler = () => {
     if (!selectedMonth || !selectedGrade) {
       console.error("Please select both month and grade.");
       return;
     }
-
     const month = moment(selectedMonth).format("MM/YYYY");
     GlobalApi.GetAttendanceList(selectedGrade, month).then((resp) => {
-      console.log(resp.data);
+      setAttendanceList(resp.data);
     });
   };
-
   return (
     <div className="p-10">
       <h2 className="text-2xl font-bold">Attendance</h2>
@@ -40,6 +42,7 @@ function Attendance() {
       </div>
 
       {/* Student Attendance Grid */}
+      <AttendanceGrid attendaceList={attendanceList} />
     </div>
   );
 }
