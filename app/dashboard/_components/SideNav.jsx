@@ -18,7 +18,7 @@ function SideNav() {
     },
     {
       id: 2,
-      name: "Students",
+      name: "Employees",
       icon: GraduationCap,
       link: "/dashboard/students",
     },
