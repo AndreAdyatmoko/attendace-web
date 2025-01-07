@@ -42,7 +42,8 @@ function Attendance() {
       </div>
 
       {/* Student Attendance Grid */}
-      <AttendanceGrid attendaceList={attendanceList} />
+      <AttendanceGrid attendaceList={attendanceList}
+      selectedMonth={selectedMonth} />
     </div>
   );
 }
